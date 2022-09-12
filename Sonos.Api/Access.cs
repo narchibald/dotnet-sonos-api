@@ -27,7 +27,7 @@ public class Access : IAccess
 
         if (data != null)
         {
-            var expiryTime = data.fetchTime + TimeSpan.FromSeconds(data.token.expires_in);
+            var expiryTime = data.FetchTime + TimeSpan.FromSeconds(data.Token.ExpiresIn);
             if (expiryTime < DateTimeOffset.Now)
             {
                 await RefreshAccessToken();
@@ -41,7 +41,7 @@ public class Access : IAccess
     {
         // Validate the token is good this function will refresh it if it is expired
         await ValidateToken();
-        message.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(data.token.token_type, data.token.access_token);
+        message.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(data.Token.TokenType, data.Token.AccessToken);
         return message;
     }
 
@@ -49,7 +49,7 @@ public class Access : IAccess
     {
         // Validate the token is good this function will refresh it if it is expired
         await ValidateToken();
-        ws.Options.SetRequestHeader("Authorization", $"{data.token.token_type} {data.token.access_token}");
+        ws.Options.SetRequestHeader("Authorization", $"{data.Token.TokenType} {data.Token.AccessToken}");
         return ws;
     }
 
@@ -60,7 +60,7 @@ public class Access : IAccess
 
     public Task RefreshAccessToken()
     {
-        return FetchAccessToken($"grant_type=refresh_token&refresh_token={data.token.refresh_token}", (m) =>
+        return FetchAccessToken($"grant_type=refresh_token&refresh_token={data.Token.RefreshToken}", (m) =>
         {
             m.Content = new StringContent(string.Empty, Encoding.UTF8, "application/x-www-form-urlencoded");
         });
@@ -85,7 +85,7 @@ public class Access : IAccess
 
     private async Task SaveToken(OAuthToken? token)
     {
-        this.data = token != null ? new TokenData { fetchTime = DateTimeOffset.Now, token = token } : null;
+        this.data = token != null ? new TokenData { FetchTime = DateTimeOffset.Now, Token = token } : null;
         Directory.CreateDirectory(Path.GetDirectoryName(this.acessTokenPath)!);
         using FileStream fileStream = new (this.acessTokenPath, FileMode.Create);
         if (this.data != null)
@@ -129,21 +129,28 @@ public class Access : IAccess
 
     public class TokenData
     {
-        public DateTimeOffset fetchTime { get; init; }
+        [System.Text.Json.Serialization.JsonPropertyName("fetchTime")]
+        public DateTimeOffset FetchTime { get; init; }
 
-        public OAuthToken token { get; init; }
+        [System.Text.Json.Serialization.JsonPropertyName("token")]
+        public OAuthToken Token { get; init; }
     }
 
     public class OAuthToken
     {
-        public string access_token { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("access_token")]
+        public string AccessToken { get; set; }
 
-        public string token_type { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("token_type")]
+        public string TokenType { get; set; }
 
-        public int expires_in { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("expires_in")]
+        public int ExpiresIn { get; set; }
 
-        public string refresh_token { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("refresh_token")]
+        public string RefreshToken { get; set; }
 
-        public string scope { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("scope")]
+        public string Scope { get; set; }
     }
 }
