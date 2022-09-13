@@ -1,7 +1,10 @@
 ﻿namespace Sonos.Api.Models.Settings
 {
+    using System.Text.Json.Serialization;
+
     public class PlayerSettings
     {
+        [JsonConstructor]
         public PlayerSettings(VolumeMode volumeMode, float volumeScalingFactor, bool monoMode, bool wifiDisable)
         {
             this.VolumeMode = volumeMode;

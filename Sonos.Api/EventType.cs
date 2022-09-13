@@ -1,14 +1,26 @@
 ﻿namespace Sonos.Api;
 
-public enum EventType
+public enum HouseholdEventType
 {
-    AudioClip,
-    Favourites,
+    Favorites,
     Groups,
-    GroupVolumne,
+    Playlists,
+}
+
+public enum GroupEventType
+{
+    GroupVolume,
     PlayBack,
     PlaybackMetadata,
-    PlaybackSession,
+}
+
+public enum PlayerEventType
+{
+    AudioClip,
     PlayerVolume,
-    Playlists,
+}
+
+public enum SessionEventType
+{
+    PlaybackSession,
 }

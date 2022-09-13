@@ -1,9 +1,11 @@
 ﻿namespace Sonos.Api.Models
 {
     using System.Collections.Generic;
+    using System.Text.Json.Serialization;
 
     public class Player
     {
+        [JsonConstructor]
         public Player(
             string id,
             string name,

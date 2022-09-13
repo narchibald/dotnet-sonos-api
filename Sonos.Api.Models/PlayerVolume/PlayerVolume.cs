@@ -1,7 +1,10 @@
 ﻿namespace Sonos.Api.Models.PlayerVolume
 {
+    using System.Text.Json.Serialization;
+
     public class PlayerVolume
     {
+        [JsonConstructor]
         public PlayerVolume(int volume, bool muted, bool @fixed)
         {
             this.Volume = volume;

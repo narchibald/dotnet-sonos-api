@@ -1,7 +1,10 @@
-﻿namespace Sonos.Api.Models.PlaybackSession
+﻿using System.Text.Json.Serialization;
+
+namespace Sonos.Api.Models.PlaybackSession
 {
     public class SessionError
     {
+        [JsonConstructor]
         public SessionError(string errorCode, string reason, string sessionId)
         {
             this.ErrorCode = errorCode;

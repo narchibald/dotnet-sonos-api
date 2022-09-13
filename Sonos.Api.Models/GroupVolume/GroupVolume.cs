@@ -1,7 +1,10 @@
-﻿namespace Sonos.Api.Models.GroupVolume
+﻿using System.Text.Json.Serialization;
+
+namespace Sonos.Api.Models.GroupVolume
 {
     public class GroupVolume
     {
+        [JsonConstructor]
         public GroupVolume(int volume, bool muted, bool @fixed)
         {
             this.Volume = volume;

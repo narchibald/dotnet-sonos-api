@@ -1,7 +1,10 @@
-﻿namespace Sonos.Api.Models.AudioClip
+﻿using System.Text.Json.Serialization;
+
+namespace Sonos.Api.Models.AudioClip
 {
     public class Clip
     {
+        [JsonConstructor]
         public Clip(
             string appId,
             string id,

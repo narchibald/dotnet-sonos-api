@@ -1,12 +1,15 @@
 ﻿namespace Sonos.Api;
 
 using Sonos.Api.Models;
+using Sonos.Api.Models.PlayerVolume;
+using System;
 
 public class Control : IControl
 {
     private readonly IControlRequest controlRequest;
     private readonly IConfiguration configuration;
-    private readonly Dictionary<string, Groups> groups = new ();
+    private readonly Dictionary<string, HouseholdGroups> groups = new ();
+    private readonly SemaphoreSlim refreshLock = new(1, 1 );
     private Dictionary<string, List<Player>> clipPlayers = new ();
     private Households? houseHolds;
 
@@ -16,16 +19,16 @@ public class Control : IControl
         this.configuration = configuration;
     }
 
-    public IReadOnlyList<Household> Households => houseHolds?.Items ?? new List<Household>();
+    public IReadOnlyList<Household> Households => this.houseHolds?.Items ?? new List<Household>();
 
-    public Groups GetHouseholdGroup(string householdId)
+    public HouseholdGroups GetHouseholdGroups(string householdId)
     {
         if (this.groups.TryGetValue(householdId, out var grps))
         {
             return grps;
         }
 
-        return new Groups();
+        return new HouseholdGroups();
     }
 
     public IReadOnlyList<Player> GetHouseholdPlayers(string householdId)
@@ -43,38 +46,49 @@ public class Control : IControl
         return this.GetHouseholdPlayers(householdId).Where(p => p.Capabilities.Contains("AUDIO_CLIP")).ToList();
     }
 
-    public async Task Start()
+    public async Task Refresh()
     {
-        this.houseHolds = await GetHouseHolds();
-        if (this.houseHolds is null)
+        await this.refreshLock.WaitAsync();
+        try
         {
-            return;
-        }
+            this.houseHolds = await this.GetHouseHolds();
+            if (this.houseHolds is null)
+            {
+                return;
+            }
 
-        await Parallel.ForEachAsync(this.houseHolds.Items, async (h, c) =>
+            this.groups.Clear();
+            await Parallel.ForEachAsync(
+                this.houseHolds.Items,
+                async (h, c) =>
+                    {
+                        var groups = await this.GetHouseHoldGroups(h);
+                        this.groups.Add(h.Id, groups ?? new HouseholdGroups());
+                    });
+        }
+        finally
         {
-            var groups = await GetHouseHoldGroups(h);
-            this.groups.Add(h.Id, groups ?? new Groups());
-        });
+            this.refreshLock.Release();
+        }
     }
 
     public async Task PlayAudioClip(Player player, Uri audioClipUri, string name)
     {
         var body = new { streamUrl = audioClipUri.ToString(), name, appId = this.configuration.AppId };
-        await controlRequest.Execute(HttpMethod.Post, $"/v1/players/{player.Id}/audioClip", body);
+        await this.controlRequest.Execute(HttpMethod.Post, $"/v1/players/{player.Id}/audioClip", body);
     }
 
-    public Task<Sonos.Api.Models.PlayerVolume.PlayerVolume?> GetPlayerVolume(Player player)
+    public Task<PlayerVolume?> GetPlayerVolume(Player player)
     {
-        return controlRequest.Execute<Sonos.Api.Models.PlayerVolume.PlayerVolume?>(HttpMethod.Get, $"/v1/players/{player.Id}/playerVolume");
+        return this.controlRequest.Execute<PlayerVolume?>(HttpMethod.Get, $"/v1/players/{player.Id}/playerVolume");
     }
 
-    public Task SetPlayerVolume(Player player, Sonos.Api.Models.PlayerVolume.PlayerVolumeUpdate update)
+    public Task SetPlayerVolume(Player player, PlayerVolumeUpdate update)
     {
-        return controlRequest.Execute<Sonos.Api.Models.PlayerVolume.PlayerVolume?>(HttpMethod.Post, $"/v1/players/{player.Id}/playerVolume", update);
+        return this.controlRequest.Execute<PlayerVolume?>(HttpMethod.Post, $"/v1/players/{player.Id}/playerVolume", update);
     }
 
-    private Task<Groups?> GetHouseHoldGroups(Household household) => controlRequest.Execute<Groups?>(HttpMethod.Get, $"v1/households/{household.Id}/groups");
+    private Task<HouseholdGroups?> GetHouseHoldGroups(Household household) => this.controlRequest.Execute<HouseholdGroups?>(HttpMethod.Get, $"v1/households/{household.Id}/groups");
 
-    private Task<Households?> GetHouseHolds() => controlRequest.Execute<Households?>(HttpMethod.Get, $"v1/households");
+    private Task<Households?> GetHouseHolds() => this.controlRequest.Execute<Households?>(HttpMethod.Get, $"v1/households");
 }

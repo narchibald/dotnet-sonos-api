@@ -1,7 +1,10 @@
-﻿namespace Sonos.Api.Models.PlaybackSession
+﻿using System.Text.Json.Serialization;
+
+namespace Sonos.Api.Models.PlaybackSession
 {
     public class SessionStatus
     {
+        [JsonConstructor]
         public SessionStatus(string sessionState, string sessionId, bool sessionCreated, string customData)
         {
             this.SessionState = sessionState;

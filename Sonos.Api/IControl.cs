@@ -6,13 +6,13 @@ public interface IControl
 {
     IReadOnlyList<Household> Households { get; }
 
-    Groups GetHouseholdGroup(string householdId);
+    HouseholdGroups GetHouseholdGroups(string householdId);
 
     IReadOnlyList<Player> GetHouseholdPlayers(string householdId);
 
     IReadOnlyList<Player> GetHouseholdClipAudioPlayers(string householdId);
 
-    Task Start();
+    Task Refresh();
 
     Task PlayAudioClip(Player player, Uri audioClipUri, string name);
 
