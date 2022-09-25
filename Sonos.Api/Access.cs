@@ -8,14 +8,14 @@ using Microsoft.AspNetCore.WebUtilities;
 
 public class Access : IAccess
 {
-    private readonly string acessTokenPath;
+    private readonly string accessTokenPath;
     private readonly IConfiguration configuration;
     private TokenData? data;
 
     public Access(IConfiguration configuration)
     {
         this.configuration = configuration;
-        this.acessTokenPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), this.configuration.AccessTokenPath, "sonos-access.key");
+        this.accessTokenPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), this.configuration.AccessTokenPath, "sonos-access.key");
     }
 
     public async Task<bool> ValidateToken()
@@ -41,6 +41,11 @@ public class Access : IAccess
     {
         // Validate the token is good this function will refresh it if it is expired
         await ValidateToken();
+        if (this.data == null)
+        {
+            throw new UnauthorizedAccessException("Sonos access has not been granted.");
+        }
+
         message.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(data.Token.TokenType, data.Token.AccessToken);
         return message;
     }
@@ -86,8 +91,8 @@ public class Access : IAccess
     private async Task SaveToken(OAuthToken? token)
     {
         this.data = token != null ? new TokenData { FetchTime = DateTimeOffset.Now, Token = token } : null;
-        Directory.CreateDirectory(Path.GetDirectoryName(this.acessTokenPath)!);
-        using FileStream fileStream = new (this.acessTokenPath, FileMode.Create);
+        Directory.CreateDirectory(Path.GetDirectoryName(this.accessTokenPath)!);
+        await using FileStream fileStream = new (this.accessTokenPath, FileMode.Create);
         if (this.data != null)
         {
             await JsonSerializer.SerializeAsync(fileStream, this.data);
@@ -96,9 +101,9 @@ public class Access : IAccess
 
     private async Task LoadToken()
     {
-        if (File.Exists(this.acessTokenPath))
+        if (File.Exists(this.accessTokenPath))
         {
-            using FileStream fileStream = new (this.acessTokenPath, FileMode.Open);
+            await using FileStream fileStream = new (this.accessTokenPath, FileMode.Open);
             this.data = await JsonSerializer.DeserializeAsync<TokenData>(fileStream);
         }
     }
@@ -120,7 +125,7 @@ public class Access : IAccess
         OAuthToken? token = null;
         if (response.IsSuccessStatusCode)
         {
-            using var stream = await response.Content.ReadAsStreamAsync();
+            await using var stream = await response.Content.ReadAsStreamAsync();
             token = await JsonSerializer.DeserializeAsync<OAuthToken>(stream);
         }
 

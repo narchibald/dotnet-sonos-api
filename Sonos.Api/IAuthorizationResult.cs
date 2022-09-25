@@ -9,6 +9,4 @@ public interface IAuthorizationResult
     bool IsErrored { get; }
 
     string? ErrorReason { get; }
-
-    Task WaitForResult();
 }

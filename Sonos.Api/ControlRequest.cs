@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 public class ControlRequest : IControlRequest
 {
-    private const string baseUri = "https://api.ws.sonos.com/control/api";
+    private const string BaseUri = "https://api.ws.sonos.com/control/api";
     private readonly IAccess access;
 
     public ControlRequest(IAccess access)
@@ -33,7 +33,7 @@ public class ControlRequest : IControlRequest
         {
             var options = new JsonSerializerOptions
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             };
 
             var json = JsonSerializer.Serialize(body, options);
@@ -51,7 +51,7 @@ public class ControlRequest : IControlRequest
             path = '/' + path;
         }
 
-        return new Uri(baseUri + path);
+        return new Uri(BaseUri + path);
     }
 
     private Task<HttpRequestMessage> MakeRequestMessage(HttpMethod method, Uri uri)
@@ -66,10 +66,10 @@ public class ControlRequest : IControlRequest
         var jsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
-            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
         };
 
-        using var stream = await response.Content.ReadAsStreamAsync();
+        await using var stream = await response.Content.ReadAsStreamAsync();
         return await JsonSerializer.DeserializeAsync<T>(stream, jsonOptions);
     }
 }
