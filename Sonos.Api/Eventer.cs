@@ -30,13 +30,14 @@ public class Eventer : IEventer, IEventHandler
         var jsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
-            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
         };
         var data = JsonSerializer.Deserialize(body, dataType, jsonOptions);
 
         var eventDataType = typeof(Sonos.Api.Models.Events.@Event<>).MakeGenericType(dataType);
 
         var target = new Sonos.Api.Models.Events.Target(targetType, targetValue);
+
         // (string HouseholdId, string @Namespace, Target Target, string SeqId, T Data)
         var eventData = Activator.CreateInstance(eventDataType, householdId, @namespace, target, seqId, data);
         @Event.Invoke((Sonos.Api.Models.Events.@Event)eventData!);

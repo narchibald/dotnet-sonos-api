@@ -9,7 +9,7 @@ public class Control : IControl
     private readonly IControlRequest controlRequest;
     private readonly IConfiguration configuration;
     private readonly Dictionary<string, HouseholdGroups> groups = new ();
-    private readonly SemaphoreSlim refreshLock = new(1, 1 );
+    private readonly SemaphoreSlim refreshLock = new (1, 1);
     private Dictionary<string, List<Player>> clipPlayers = new ();
     private Households? houseHolds;
 
@@ -58,6 +58,7 @@ public class Control : IControl
             }
 
             this.groups.Clear();
+#if NET6_0_OR_GREATER
             await Parallel.ForEachAsync(
                 this.houseHolds.Items,
                 async (h, c) =>
@@ -65,6 +66,13 @@ public class Control : IControl
                         var groups = await this.GetHouseHoldGroups(h);
                         this.groups.Add(h.Id, groups ?? new HouseholdGroups());
                     });
+#else
+            foreach (var h in this.houseHolds.Items)
+            {
+                var groups = await this.GetHouseHoldGroups(h);
+                this.groups.Add(h.Id, groups ?? new HouseholdGroups());
+            }
+#endif
         }
         finally
         {

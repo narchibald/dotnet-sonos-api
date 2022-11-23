@@ -92,9 +92,9 @@ public class Access : IAccess
     {
         this.data = token != null ? new TokenData { FetchTime = DateTimeOffset.Now, Token = token } : null;
         Directory.CreateDirectory(Path.GetDirectoryName(this.accessTokenPath)!);
-        await using FileStream fileStream = new (this.accessTokenPath, FileMode.Create);
         if (this.data != null)
         {
+            await using FileStream fileStream = new (this.accessTokenPath, FileMode.Create);
             await JsonSerializer.SerializeAsync(fileStream, this.data);
         }
     }
@@ -103,8 +103,15 @@ public class Access : IAccess
     {
         if (File.Exists(this.accessTokenPath))
         {
-            await using FileStream fileStream = new (this.accessTokenPath, FileMode.Open);
-            this.data = await JsonSerializer.DeserializeAsync<TokenData>(fileStream);
+            try
+            {
+                await using FileStream fileStream = new (this.accessTokenPath, FileMode.Open);
+                this.data = await JsonSerializer.DeserializeAsync<TokenData>(fileStream);
+            }
+            catch (JsonException e)
+            {
+                this.data = null;
+            }
         }
     }
 
