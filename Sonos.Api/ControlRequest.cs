@@ -8,10 +8,12 @@ public class ControlRequest : IControlRequest
 {
     private const string BaseUri = "https://api.ws.sonos.com/control/api";
     private readonly IAccess access;
+    private readonly IHttpClientFactory httpClientFactory;
 
-    public ControlRequest(IAccess access)
+    public ControlRequest(IAccess access, IHttpClientFactory httpClientFactory)
     {
         this.access = access;
+        this.httpClientFactory = httpClientFactory;
     }
 
     public async Task<T?> Execute<T>(HttpMethod method, string path, object? body = null)
@@ -40,7 +42,7 @@ public class ControlRequest : IControlRequest
             message.Content = new StringContent(json, Encoding.UTF8, "application/json");
         }
 
-        using HttpClient client = new ();
+        var client = this.httpClientFactory.CreateClient();
         return await client.SendAsync(message);
     }
 

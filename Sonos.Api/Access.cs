@@ -10,11 +10,13 @@ public class Access : IAccess
 {
     private readonly string accessTokenPath;
     private readonly IConfiguration configuration;
+    private readonly IHttpClientFactory httpClientFactory;
     private TokenData? data;
 
-    public Access(IConfiguration configuration)
+    public Access(IConfiguration configuration, IHttpClientFactory httpClientFactory)
     {
         this.configuration = configuration;
+        this.httpClientFactory = httpClientFactory;
         this.accessTokenPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), this.configuration.AccessTokenPath, "sonos-access.key");
     }
 
@@ -127,7 +129,7 @@ public class Access : IAccess
         message.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes(basicAuth)));
         extraInitFunc?.Invoke(message);
 
-        using HttpClient client = new ();
+        var client = this.httpClientFactory.CreateClient();
         using var response = await client.SendAsync(message);
         OAuthToken? token = null;
         if (response.IsSuccessStatusCode)

@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<Eventer>();
         services.AddSingleton<IEventer>(sc => sc.GetRequiredService<Eventer>());
         services.AddSingleton<IEventHandler>(sc => sc.GetRequiredService<Eventer>());
+        services.AddHttpClient();
 
         return services;
     }
