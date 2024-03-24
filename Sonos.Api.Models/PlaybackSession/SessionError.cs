@@ -1,7 +1,7 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Sonos.Api.Models.PlaybackSession
+﻿namespace Sonos.Api.Models.PlaybackSession
 {
+    using System.Text.Json.Serialization;
+
     public class SessionError
     {
         [JsonConstructor]

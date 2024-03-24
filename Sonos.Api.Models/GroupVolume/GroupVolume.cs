@@ -1,7 +1,7 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Sonos.Api.Models.GroupVolume
+﻿namespace Sonos.Api.Models.GroupVolume
 {
+    using System.Text.Json.Serialization;
+
     public class GroupVolume
     {
         [JsonConstructor]

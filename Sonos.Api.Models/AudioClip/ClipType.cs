@@ -2,10 +2,10 @@
 {
     public enum ClipType
     {
-        //CHIME,
+        // CHIME,
         Chime,
 
-        //CUSTOM
-        Custom
+        // CUSTOM
+        Custom,
     }
 }

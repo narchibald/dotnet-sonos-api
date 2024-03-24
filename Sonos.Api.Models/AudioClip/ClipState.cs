@@ -2,14 +2,14 @@
 {
     public enum ClipState
     {
-        Active, //ACTIVE,
+        Active, // ACTIVE,
 
         Dismissed, // DISMISSED,
 
-        Done, //DONE,
+        Done, // DONE,
 
         Error, // ERROR,
 
-        Interrupted // INTERRUPTED
+        Interrupted, // INTERRUPTED
     }
 }

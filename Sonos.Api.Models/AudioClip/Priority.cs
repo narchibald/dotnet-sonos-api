@@ -4,6 +4,6 @@
     {
         Low, // LOW,
 
-        High //HIGH
+        High, // HIGH
     }
 }

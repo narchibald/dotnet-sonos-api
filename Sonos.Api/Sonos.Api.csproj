@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>10.0</LangVersion>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Sonos.Api.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,6 +32,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sonos.Api.Models\Sonos.Api.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Sonos.Api.snk">
+      <Link>Sonos.Api.snk</Link>
+    </None>
   </ItemGroup>
 
 </Project>

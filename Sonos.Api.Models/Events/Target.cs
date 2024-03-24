@@ -1,7 +1,7 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Sonos.Api.Models.Events
+﻿namespace Sonos.Api.Models.Events
 {
+    using System.Text.Json.Serialization;
+
     public class Target
     {
         [JsonConstructor]
