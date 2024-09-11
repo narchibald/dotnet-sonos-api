@@ -7,6 +7,9 @@
     <LangVersion>8.0</LangVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Sonos.Api.snk</AssemblyOriginatorKeyFile>
+    <PackageId>DotNet-Sonos.Api.Models</PackageId>
+    <Title>Sonos Api Models</Title>
+    <PackageProjectUrl>https://github.com/narchibald/dotnet-sonos-api.git</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +21,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Text.Json" Version="8.0.3" />
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
   </ItemGroup>
 
   <ItemGroup>

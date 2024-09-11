@@ -4,7 +4,7 @@ using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.IdentityModel.Tokens;
 
 public class Access : IAccess
 {
@@ -85,7 +85,7 @@ public class Access : IAccess
         builder.Append(this.configuration.ClientSecret);
         using var sha256 = SHA256.Create();
         var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(builder.ToString()));
-        var computedSignature = WebEncoders.Base64UrlEncode(hash);
+        var computedSignature = Base64UrlEncoder.Encode(hash);
 
         return computedSignature == signature;
     }
